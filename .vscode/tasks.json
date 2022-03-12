@@ -36,6 +36,17 @@
                 "${workspaceFolder}/dotnet-filesystem-benchmark.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "run",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "run",
+                "-c",
+                "Release"
+            ],
+            "problemMatcher": []
         }
     ]
 }
