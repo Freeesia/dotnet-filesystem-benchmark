@@ -36,14 +36,10 @@ public class FileReadTest
     [Arguments(FourKibibytes, FileOptions.None, 1)]
     [Arguments(FourKibibytes, FileOptions.Asynchronous, FourKibibytes)]
     [Arguments(FourKibibytes, FileOptions.Asynchronous, 1)]
-    [Arguments(FourKibibytes, FileOptions.Asynchronous | FileOptions.SequentialScan, FourKibibytes)]
-    [Arguments(FourKibibytes, FileOptions.Asynchronous | FileOptions.SequentialScan, 1)]
     [Arguments(HundredMibibytes, FileOptions.None, FourKibibytes)]
     [Arguments(HundredMibibytes, FileOptions.None, 1)]
     [Arguments(HundredMibibytes, FileOptions.Asynchronous, FourKibibytes)]
     [Arguments(HundredMibibytes, FileOptions.Asynchronous, 1)]
-    [Arguments(HundredMibibytes, FileOptions.Asynchronous | FileOptions.SequentialScan, FourKibibytes)]
-    [Arguments(HundredMibibytes, FileOptions.Asynchronous | FileOptions.SequentialScan, 1)]
     public async Task<long> ReadAsync(int userBufferSize, FileOptions options, int streamBufferSize)
     {
         var rootBuffer = ArrayPool<byte>.Shared.Rent(userBufferSize);
