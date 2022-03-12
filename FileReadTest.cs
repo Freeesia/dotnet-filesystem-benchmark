@@ -1,16 +1,13 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 
 namespace dotnet_filesystem_benchmark;
 
-[SimpleJob(RuntimeMoniker.Net48)]
-[SimpleJob(RuntimeMoniker.NetCoreApp31)]
-[SimpleJob(RuntimeMoniker.HostProcess)]
+
 [MemoryDiagnoser]
 [RankColumn]
 public class FileReadTest
@@ -27,15 +24,27 @@ public class FileReadTest
 
     [GlobalCleanup]
     public void Cleanup() => File.Delete(_filePath);
-    [Benchmark]
-    public byte[] ReadAll() => File.ReadAllBytes(_filePath);
 
-#if NETCOREAPP2_0_OR_GREATER
     [Benchmark]
-    public Task<byte[]> ReadAllAsync() => File.ReadAllBytesAsync(_filePath);
-#endif
+    [Arguments(FourKibibytes, FileOptions.None, FourKibibytes)]
+    [Arguments(FourKibibytes, FileOptions.None, 1)]
+    [Arguments(HundredMibibytes, FileOptions.None, FourKibibytes)]
+    [Arguments(HundredMibibytes, FileOptions.None, 1)]
+    public long Read(int userBufferSize, FileOptions options, int streamBufferSize)
+    {
+        var rootBuffer = ArrayPool<byte>.Shared.Rent(userBufferSize);
+        long bytesRead = 0;
+        using var fileStream = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.Read, streamBufferSize, options);
+        int count;
+        do
+        {
+            count = fileStream.Read(rootBuffer, 0, userBufferSize);
+            bytesRead += count;
+        } while (count > 0);
+        ArrayPool<byte>.Shared.Return(rootBuffer);
+        return bytesRead;
+    }
 
-#if NET6_0_OR_GREATER
     [Benchmark]
     [Arguments(FourKibibytes, FileOptions.None, FourKibibytes)]
     [Arguments(FourKibibytes, FileOptions.None, 1)]
@@ -47,6 +56,7 @@ public class FileReadTest
     [Arguments(HundredMibibytes, FileOptions.Asynchronous, 1)]
     public async Task<long> ReadAsync(int userBufferSize, FileOptions options, int streamBufferSize)
     {
+#if NET6_0_OR_GREATER
         var rootBuffer = ArrayPool<byte>.Shared.Rent(userBufferSize);
         var userBuffer = new Memory<byte>(rootBuffer)[..userBufferSize];
         long bytesRead = 0;
@@ -59,6 +69,8 @@ public class FileReadTest
         } while (count > 0);
         ArrayPool<byte>.Shared.Return(rootBuffer);
         return bytesRead;
-    }
+#else
+        throw new NotSupportedException("File.ReadAllBytesAsync is not supported");
 #endif
+    }
 }

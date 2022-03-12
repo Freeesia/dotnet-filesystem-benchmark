@@ -44,22 +44,11 @@
             "args": [
                 "run",
                 "-c",
-                "Release"
+                "Release",
+                "-f",
+                "net6.0",
             ],
             "problemMatcher": []
         },
-        {
-            "label": "dry",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "run",
-                "-c",
-                "Release",
-                "-j",
-                "Dry"
-            ],
-            "problemMatcher": []
-        }
     ]
 }
