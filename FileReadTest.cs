@@ -8,6 +8,9 @@ using BenchmarkDotNet.Jobs;
 
 namespace dotnet_filesystem_benchmark;
 
+[SimpleJob(RuntimeMoniker.Net48)]
+[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+[SimpleJob(RuntimeMoniker.HostProcess)]
 [MemoryDiagnoser]
 [RankColumn]
 public class FileReadTest
