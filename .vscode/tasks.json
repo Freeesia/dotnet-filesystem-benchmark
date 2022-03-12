@@ -47,6 +47,19 @@
                 "Release"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "dry",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "run",
+                "-c",
+                "Release",
+                "-j",
+                "Dry"
+            ],
+            "problemMatcher": []
         }
     ]
 }

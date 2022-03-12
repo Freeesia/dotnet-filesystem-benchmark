@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 
 namespace dotnet_filesystem_benchmark;
 
-[ShortRunJob]
 [MemoryDiagnoser]
 [RankColumn]
 public class FileReadTest
@@ -24,13 +24,15 @@ public class FileReadTest
 
     [GlobalCleanup]
     public void Cleanup() => File.Delete(_filePath);
-
     [Benchmark]
     public byte[] ReadAll() => File.ReadAllBytes(_filePath);
 
+#if NETCOREAPP2_0_OR_GREATER
     [Benchmark]
     public Task<byte[]> ReadAllAsync() => File.ReadAllBytesAsync(_filePath);
+#endif
 
+#if NET6_0_OR_GREATER
     [Benchmark]
     [Arguments(FourKibibytes, FileOptions.None, FourKibibytes)]
     [Arguments(FourKibibytes, FileOptions.None, 1)]
@@ -55,4 +57,5 @@ public class FileReadTest
         ArrayPool<byte>.Shared.Return(rootBuffer);
         return bytesRead;
     }
+#endif
 }
